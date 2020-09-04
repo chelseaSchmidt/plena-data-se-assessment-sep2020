@@ -21,7 +21,11 @@ export default class App extends React.Component {
   handleSubmit() {
     const { input } = this.state;
     if (input.length === 0) {
-      this.setState({ error: true });
+      this.setState({
+        firstNonRepeated: null,
+        rewrittenInput: null,
+        error: true,
+      });
       return;
     }
 
@@ -73,6 +77,7 @@ export default class App extends React.Component {
       }
     });
     this.setState({
+      input: '',
       rewrittenInput,
       firstNonRepeated,
       error: false,
