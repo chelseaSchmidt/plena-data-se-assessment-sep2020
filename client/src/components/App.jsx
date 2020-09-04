@@ -59,10 +59,9 @@ export default class App extends React.Component {
     if (nonRepeatChars.length === 0) {
       firstNonRepeated = 'No non-repeating characters!';
     } else {
-      firstNonRepeated =
-        nonRepeatChars[0].lowerCase[0] ?
-        nonRepeatChars[0].char :
-        nonRepeatChars[0].char.toUpperCase();
+      firstNonRepeated = nonRepeatChars[0].lowerCase[0]
+        ? nonRepeatChars[0].char
+        : nonRepeatChars[0].char.toUpperCase();
     }
 
     let rewrittenInput = '';
