@@ -1,5 +1,4 @@
 import React from 'react';
-import _ from 'lodash';
 
 export default class App extends React.Component {
   constructor(props) {
@@ -19,25 +18,33 @@ export default class App extends React.Component {
   }
 
   handleSubmit() {
-    const { input, firstNonRepeated, rewrittenInput } = this.state;
+    const { input } = this.state;
     if (input.length === 0) {
       this.setState({ error: true });
     }
+
     const charCounts = {};
-    const charArray = input.toLowerCase().split('');
+    const charArray = input.split('');
     charArray.forEach((char, i) => {
-      if (char in charCounts) {
-        charCounts[char].count += 1;
+      const lowerCaseChar = char.toLowerCase();
+      const isLowerCase = lowerCaseChar === char;
+
+      if (lowerCaseChar in charCounts) {
+        charCounts[lowerCaseChar].count += 1;
+        charCounts[lowerCaseChar].lowerCase.push(isLowerCase);
       } else {
-        charCounts[char] = {
-          char: char,
+        charCounts[lowerCaseChar] = {
+          char: lowerCaseChar,
           count: 1,
           index: i,
+          lowerCase: [isLowerCase],
         };
       }
     });
-    const nonRepeatChars = _.filter(charCounts, (charObj) => charObj.count === 1);
-    const lowestIdxChar = _.reduce(nonRepeatChars, (lastLowest, charObj) => {
+
+    const charCountsArr = Object.keys(charCounts).map((char) => charCounts[char]);
+    const nonRepeatChars = charCountsArr.filter((charObj) => charObj.count === 1);
+    const lowestIdxChar = nonRepeatChars.reduce((lastLowest, charObj) => {
       if (Object.keys(lastLowest).length === 0) {
         return charObj;
       } else if (charObj.index < lastLowest.index) {
@@ -46,7 +53,25 @@ export default class App extends React.Component {
         return lastLowest;
       }
     }, {});
+
+    let rewrittenInput = '';
+    charCountsArr.sort((a, b) => {
+      if (a.count < b.count) { return -1; }
+      if (a.count > b.count) { return 1; }
+      if (a.count === b.count) {
+        if (a.index < b.index) { return -1; }
+        if (a.index > b.index) { return 1; }
+      }
+    });
+    charCountsArr.forEach((char) => {
+      for (let i = 0; i < char.count; i += 1) {
+        const isLowerCase = char.lowerCase[i];
+        let casedChar = isLowerCase ? char.char : char.char.toUpperCase();
+        rewrittenInput += casedChar;
+      }
+    });
     this.setState({
+      rewrittenInput,
       firstNonRepeated: lowestIdxChar.char,
       error: false,
     });
