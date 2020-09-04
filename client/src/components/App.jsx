@@ -28,7 +28,6 @@ export default class App extends React.Component {
     charArray.forEach((char, i) => {
       const lowerCaseChar = char.toLowerCase();
       const isLowerCase = lowerCaseChar === char;
-
       if (lowerCaseChar in charCounts) {
         charCounts[lowerCaseChar].count += 1;
         charCounts[lowerCaseChar].lowerCase.push(isLowerCase);
@@ -47,11 +46,11 @@ export default class App extends React.Component {
     const lowestIdxChar = nonRepeatChars.reduce((lastLowest, charObj) => {
       if (Object.keys(lastLowest).length === 0) {
         return charObj;
-      } else if (charObj.index < lastLowest.index) {
-        return charObj;
-      } else {
-        return lastLowest;
       }
+      if (charObj.index < lastLowest.index) {
+        return charObj;
+      }
+      return lastLowest;
     }, {});
 
     let rewrittenInput = '';
@@ -62,11 +61,12 @@ export default class App extends React.Component {
         if (a.index < b.index) { return -1; }
         if (a.index > b.index) { return 1; }
       }
+      return 0;
     });
     charCountsArr.forEach((char) => {
       for (let i = 0; i < char.count; i += 1) {
         const isLowerCase = char.lowerCase[i];
-        let casedChar = isLowerCase ? char.char : char.char.toUpperCase();
+        const casedChar = isLowerCase ? char.char : char.char.toUpperCase();
         rewrittenInput += casedChar;
       }
     });
@@ -78,7 +78,13 @@ export default class App extends React.Component {
   }
 
   render() {
-    const { input, firstNonRepeated, rewrittenInput, error } = this.state;
+    const {
+      input,
+      firstNonRepeated,
+      rewrittenInput,
+      error,
+    } = this.state;
+
     return (
       <div>
         <label htmlFor="string-input">
