@@ -1,4 +1,5 @@
 import React from 'react';
+import '../styles/App.css';
 
 export default class App extends React.Component {
   constructor(props) {
@@ -21,6 +22,7 @@ export default class App extends React.Component {
     const { input } = this.state;
     if (input.length === 0) {
       this.setState({ error: true });
+      return;
     }
 
     const charCounts = {};
@@ -42,18 +44,6 @@ export default class App extends React.Component {
     });
 
     const charCountsArr = Object.keys(charCounts).map((char) => charCounts[char]);
-    const nonRepeatChars = charCountsArr.filter((charObj) => charObj.count === 1);
-    const lowestIdxChar = nonRepeatChars.reduce((lastLowest, charObj) => {
-      if (Object.keys(lastLowest).length === 0) {
-        return charObj;
-      }
-      if (charObj.index < lastLowest.index) {
-        return charObj;
-      }
-      return lastLowest;
-    }, {});
-
-    let rewrittenInput = '';
     charCountsArr.sort((a, b) => {
       if (a.count < b.count) { return -1; }
       if (a.count > b.count) { return 1; }
@@ -63,6 +53,19 @@ export default class App extends React.Component {
       }
       return 0;
     });
+
+    const nonRepeatChars = charCountsArr.filter((charObj) => charObj.count === 1);
+    let firstNonRepeated;
+    if (nonRepeatChars.length === 0) {
+      firstNonRepeated = 'No non-repeating characters!';
+    } else {
+      firstNonRepeated =
+        nonRepeatChars[0].lowerCase[0] ?
+        nonRepeatChars[0].char :
+        nonRepeatChars[0].char.toUpperCase();
+    }
+
+    let rewrittenInput = '';
     charCountsArr.forEach((char) => {
       for (let i = 0; i < char.count; i += 1) {
         const isLowerCase = char.lowerCase[i];
@@ -72,7 +75,7 @@ export default class App extends React.Component {
     });
     this.setState({
       rewrittenInput,
-      firstNonRepeated: lowestIdxChar.char,
+      firstNonRepeated,
       error: false,
     });
   }
@@ -85,6 +88,11 @@ export default class App extends React.Component {
       error,
     } = this.state;
 
+    let toggleClass = 'success';
+    if (firstNonRepeated === 'No non-repeating characters!' || error) {
+      toggleClass = 'error';
+    }
+
     return (
       <div>
         <label htmlFor="string-input">
@@ -94,13 +102,13 @@ export default class App extends React.Component {
         </label>
         <div hidden={!firstNonRepeated}>
           First non-repeated character:
-          <div>{firstNonRepeated}</div>
+          <div className={toggleClass}>{firstNonRepeated}</div>
         </div>
         <div hidden={!rewrittenInput}>
           Rewritten in order of number of occurrences:
-          <div>{rewrittenInput}</div>
+          <div id="rewritten-input">{rewrittenInput}</div>
         </div>
-        <div hidden={!error}>
+        <div hidden={!error} className={toggleClass}>
           Please enter a string before submitting!
         </div>
       </div>
